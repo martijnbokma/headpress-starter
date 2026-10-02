@@ -27,6 +27,15 @@ export type AcfFieldGroupFields = {
   readonly fieldGroupName: Maybe<Scalars['String']['output']>;
 };
 
+/** Connection between the UniversalSectionsUniversalSectionsHeroLayout_Fields type and the MediaItem type */
+export type AcfMediaItemConnectionEdge = Edge & MediaItemConnectionEdge & OneToOneConnection & {
+  readonly __typename?: 'AcfMediaItemConnectionEdge';
+  /** Opaque reference to the nodes position in the connection. Value can be used with pagination args. */
+  readonly cursor: Maybe<Scalars['String']['output']>;
+  /** The node of the connection, without the edges */
+  readonly node: MediaItem;
+};
+
 /** Avatars are profile images for users. WordPress by default uses the Gravatar service to host and fetch avatars from. */
 export type Avatar = {
   readonly __typename?: 'Avatar';
@@ -1202,7 +1211,9 @@ export type ContentTemplate = {
 /** The templates that can be assigned to content. Used to filter a connection by the template its content uses. */
 export type ContentTemplateEnum =
   /** The default template, applied when no specific template is assigned. */
-  | 'DEFAULT_TEMPLATE';
+  | 'DEFAULT_TEMPLATE'
+  /** The "Page No Title" template. */
+  | 'PAGE_NO_TITLE_BLOCK_TEMPLATE';
 
 /** An Post Type object */
 export type ContentType = Node & UniformResourceIdentifiable & {
@@ -3225,7 +3236,7 @@ export type MenuItemNodeIdTypeEnum =
   | 'ID';
 
 /** Deprecated in favor of MenuItemLinkable Interface */
-export type MenuItemObjectUnion = Category | Page | Post | Tag;
+export type MenuItemObjectUnion = Category | Page | Post | PostFormat | Tag;
 
 /** Connection between the MenuItem type and the Menu type */
 export type MenuItemToMenuConnectionEdge = Edge & MenuConnectionEdge & OneToOneConnection & {
@@ -3705,7 +3716,7 @@ export type OrderEnum =
   | 'DESC';
 
 /** A standalone content entry generally used for static, non-chronological content such as &quot;About Us&quot; or &quot;Contact&quot; pages. */
-export type Page = ContentNode & DatabaseIdentifier & HierarchicalContentNode & HierarchicalNode & MenuItemLinkable & Node & NodeWithAuthor & NodeWithComments & NodeWithContentEditor & NodeWithFeaturedImage & NodeWithPageAttributes & NodeWithRevisions & NodeWithTemplate & NodeWithTitle & Previewable & UniformResourceIdentifiable & WithAcfPageFields & {
+export type Page = ContentNode & DatabaseIdentifier & HierarchicalContentNode & HierarchicalNode & MenuItemLinkable & Node & NodeWithAuthor & NodeWithComments & NodeWithContentEditor & NodeWithFeaturedImage & NodeWithPageAttributes & NodeWithRevisions & NodeWithTemplate & NodeWithTitle & Previewable & UniformResourceIdentifiable & WithAcfUniversalSections & {
   readonly __typename?: 'Page';
   /** Returns ancestors of the node. Default ordered as lowest (closest to the child) to highest (closest to the root). */
   readonly ancestors: Maybe<HierarchicalContentNodeToContentNodeAncestorsConnection>;
@@ -3785,8 +3796,6 @@ export type Page = ContentNode & DatabaseIdentifier & HierarchicalContentNode & 
   readonly modified: Maybe<Scalars['String']['output']>;
   /** The GMT modified time for a post. If a post was recently updated the modified field will change to match the corresponding time in GMT. */
   readonly modifiedGmt: Maybe<Scalars['String']['output']>;
-  /** Fields of the PageFields ACF Field Group */
-  readonly pageFields: Maybe<PageFields>;
   /**
    * The unique numeric identifier for the content node.
    * @deprecated Deprecated in favor of the databaseId field
@@ -3818,6 +3827,8 @@ export type Page = ContentNode & DatabaseIdentifier & HierarchicalContentNode & 
   readonly template: Maybe<ContentTemplate>;
   /** The title of the post. This is currently just the raw title. An amendment to support rendered title needs to be made. */
   readonly title: Maybe<Scalars['String']['output']>;
+  /** Fields of the UniversalSections ACF Field Group */
+  readonly universalSections: Maybe<UniversalSections>;
   /** The unique resource identifier path */
   readonly uri: Maybe<Scalars['String']['output']>;
 };
@@ -3922,29 +3933,6 @@ export type PageConnectionPageInfo = {
   readonly hasPreviousPage: Scalars['Boolean']['output'];
   /** When paginating backwards, the cursor to continue. */
   readonly startCursor: Maybe<Scalars['String']['output']>;
-};
-
-/** The &quot;PageFields&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
-export type PageFields = AcfFieldGroup & AcfFieldGroupFields & PageFields_Fields & {
-  readonly __typename?: 'PageFields';
-  /**
-   * The name of the field group
-   * @deprecated Use __typename instead
-   */
-  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
-  /** Short summary shown under the page title. */
-  readonly intro: Maybe<Scalars['String']['output']>;
-};
-
-/** Interface representing fields of the ACF &quot;PageFields&quot; Field Group */
-export type PageFields_Fields = {
-  /**
-   * The name of the field group
-   * @deprecated Use __typename instead
-   */
-  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
-  /** Short summary shown under the page title. */
-  readonly intro: Maybe<Scalars['String']['output']>;
 };
 
 /** Identifier types for retrieving a specific Page. Specifies which unique attribute is used to find an exact Page. */
@@ -4526,7 +4514,7 @@ export type PostConnectionPageInfo = {
 };
 
 /** A standardized classification system for content presentation styles. These formats can be used to display content differently based on type, such as &quot;standard&quot;, &quot;gallery&quot;, &quot;video&quot;, etc. */
-export type PostFormat = DatabaseIdentifier & Node & TermNode & UniformResourceIdentifiable & {
+export type PostFormat = DatabaseIdentifier & MenuItemLinkable & Node & TermNode & UniformResourceIdentifiable & {
   readonly __typename?: 'PostFormat';
   /** Connection between the PostFormat type and the ContentNode type */
   readonly contentNodes: Maybe<PostFormatToContentNodeConnection>;
@@ -8242,6 +8230,13 @@ export type TaxonomyToTermNodeConnectionPageInfo = PageInfo & TermNodeConnection
   readonly startCursor: Maybe<Scalars['String']['output']>;
 };
 
+/** The template assigned to the node */
+export type Template_PageNoTitle = ContentTemplate & {
+  readonly __typename?: 'Template_PageNoTitle';
+  /** The name of the template */
+  readonly templateName: Maybe<Scalars['String']['output']>;
+};
+
 /** Base interface for taxonomy terms such as categories and tags. Terms are used to organize and classify content. */
 export type TermNode = {
   /** The number of objects connected to the object */
@@ -8515,6 +8510,436 @@ export type UniformResourceIdentifiable = {
   readonly isTermNode: Scalars['Boolean']['output'];
   /** The unique resource identifier path */
   readonly uri: Maybe<Scalars['String']['output']>;
+};
+
+/** The &quot;UniversalSections&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
+export type UniversalSections = AcfFieldGroup & AcfFieldGroupFields & UniversalSections_Fields & {
+  readonly __typename?: 'UniversalSections';
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Assemble your page using modular, high-performance sections. */
+  readonly universalSections: Maybe<ReadonlyArray<Maybe<UniversalSectionsUniversalSections_Layout>>>;
+};
+
+/** The &quot;UniversalSectionsUniversalSectionsContactFormLayout&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
+export type UniversalSectionsUniversalSectionsContactFormLayout = AcfFieldGroup & AcfFieldGroupFields & UniversalSectionsUniversalSectionsContactFormLayout_Fields & UniversalSectionsUniversalSections_Layout & {
+  readonly __typename?: 'UniversalSectionsUniversalSectionsContactFormLayout';
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsContactFormLayout&quot; Field Group */
+  readonly description: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsContactFormLayout&quot; Field Group */
+  readonly headline: Maybe<Scalars['String']['output']>;
+  /** Form submissions will be dispatched to this email address. */
+  readonly recipientEmail: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsContactFormLayout&quot; Field Group */
+  readonly submitLabel: Maybe<Scalars['String']['output']>;
+};
+
+/** Interface representing fields of the ACF &quot;UniversalSectionsUniversalSectionsContactFormLayout&quot; Field Group */
+export type UniversalSectionsUniversalSectionsContactFormLayout_Fields = {
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsContactFormLayout&quot; Field Group */
+  readonly description: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsContactFormLayout&quot; Field Group */
+  readonly headline: Maybe<Scalars['String']['output']>;
+  /** Form submissions will be dispatched to this email address. */
+  readonly recipientEmail: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsContactFormLayout&quot; Field Group */
+  readonly submitLabel: Maybe<Scalars['String']['output']>;
+};
+
+/** The &quot;UniversalSectionsUniversalSectionsCtaBannerLayout&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
+export type UniversalSectionsUniversalSectionsCtaBannerLayout = AcfFieldGroup & AcfFieldGroupFields & UniversalSectionsUniversalSectionsCtaBannerLayout_Fields & UniversalSectionsUniversalSections_Layout & {
+  readonly __typename?: 'UniversalSectionsUniversalSectionsCtaBannerLayout';
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsCtaBannerLayout&quot; Field Group */
+  readonly buttonLabel: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsCtaBannerLayout&quot; Field Group */
+  readonly buttonUrl: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsCtaBannerLayout&quot; Field Group */
+  readonly headline: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;select&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsCtaBannerLayout&quot; Field Group */
+  readonly style: Maybe<ReadonlyArray<Maybe<Scalars['String']['output']>>>;
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsCtaBannerLayout&quot; Field Group */
+  readonly subheadline: Maybe<Scalars['String']['output']>;
+};
+
+/** Interface representing fields of the ACF &quot;UniversalSectionsUniversalSectionsCtaBannerLayout&quot; Field Group */
+export type UniversalSectionsUniversalSectionsCtaBannerLayout_Fields = {
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsCtaBannerLayout&quot; Field Group */
+  readonly buttonLabel: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsCtaBannerLayout&quot; Field Group */
+  readonly buttonUrl: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsCtaBannerLayout&quot; Field Group */
+  readonly headline: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;select&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsCtaBannerLayout&quot; Field Group */
+  readonly style: Maybe<ReadonlyArray<Maybe<Scalars['String']['output']>>>;
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsCtaBannerLayout&quot; Field Group */
+  readonly subheadline: Maybe<Scalars['String']['output']>;
+};
+
+/** The &quot;UniversalSectionsUniversalSectionsFaqAccordionLayout&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
+export type UniversalSectionsUniversalSectionsFaqAccordionLayout = AcfFieldGroup & AcfFieldGroupFields & UniversalSectionsUniversalSectionsFaqAccordionLayout_Fields & UniversalSectionsUniversalSections_Layout & {
+  readonly __typename?: 'UniversalSectionsUniversalSectionsFaqAccordionLayout';
+  /** Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFaqAccordionLayout&quot; Field Group */
+  readonly faqs: Maybe<ReadonlyArray<Maybe<UniversalSectionsUniversalSectionsFaqs>>>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFaqAccordionLayout&quot; Field Group */
+  readonly title: Maybe<Scalars['String']['output']>;
+};
+
+/** Interface representing fields of the ACF &quot;UniversalSectionsUniversalSectionsFaqAccordionLayout&quot; Field Group */
+export type UniversalSectionsUniversalSectionsFaqAccordionLayout_Fields = {
+  /** Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFaqAccordionLayout&quot; Field Group */
+  readonly faqs: Maybe<ReadonlyArray<Maybe<UniversalSectionsUniversalSectionsFaqs>>>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFaqAccordionLayout&quot; Field Group */
+  readonly title: Maybe<Scalars['String']['output']>;
+};
+
+/** The &quot;UniversalSectionsUniversalSectionsFaqs&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
+export type UniversalSectionsUniversalSectionsFaqs = AcfFieldGroup & AcfFieldGroupFields & UniversalSectionsUniversalSectionsFaqs_Fields & {
+  readonly __typename?: 'UniversalSectionsUniversalSectionsFaqs';
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFaqs&quot; Field Group */
+  readonly answer: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFaqs&quot; Field Group */
+  readonly question: Maybe<Scalars['String']['output']>;
+};
+
+/** Interface representing fields of the ACF &quot;UniversalSectionsUniversalSectionsFaqs&quot; Field Group */
+export type UniversalSectionsUniversalSectionsFaqs_Fields = {
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFaqs&quot; Field Group */
+  readonly answer: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFaqs&quot; Field Group */
+  readonly question: Maybe<Scalars['String']['output']>;
+};
+
+/** The &quot;UniversalSectionsUniversalSectionsFeatures&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
+export type UniversalSectionsUniversalSectionsFeatures = AcfFieldGroup & AcfFieldGroupFields & UniversalSectionsUniversalSectionsFeatures_Fields & {
+  readonly __typename?: 'UniversalSectionsUniversalSectionsFeatures';
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeatures&quot; Field Group */
+  readonly description: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeatures&quot; Field Group */
+  readonly icon: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeatures&quot; Field Group */
+  readonly linkUrl: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeatures&quot; Field Group */
+  readonly title: Maybe<Scalars['String']['output']>;
+};
+
+/** The &quot;UniversalSectionsUniversalSectionsFeaturesGridLayout&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
+export type UniversalSectionsUniversalSectionsFeaturesGridLayout = AcfFieldGroup & AcfFieldGroupFields & UniversalSectionsUniversalSectionsFeaturesGridLayout_Fields & UniversalSectionsUniversalSections_Layout & {
+  readonly __typename?: 'UniversalSectionsUniversalSectionsFeaturesGridLayout';
+  /** Field of the &quot;select&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeaturesGridLayout&quot; Field Group */
+  readonly columns: Maybe<ReadonlyArray<Maybe<Scalars['String']['output']>>>;
+  /** Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeaturesGridLayout&quot; Field Group */
+  readonly features: Maybe<ReadonlyArray<Maybe<UniversalSectionsUniversalSectionsFeatures>>>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeaturesGridLayout&quot; Field Group */
+  readonly subtitle: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeaturesGridLayout&quot; Field Group */
+  readonly title: Maybe<Scalars['String']['output']>;
+};
+
+/** Interface representing fields of the ACF &quot;UniversalSectionsUniversalSectionsFeaturesGridLayout&quot; Field Group */
+export type UniversalSectionsUniversalSectionsFeaturesGridLayout_Fields = {
+  /** Field of the &quot;select&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeaturesGridLayout&quot; Field Group */
+  readonly columns: Maybe<ReadonlyArray<Maybe<Scalars['String']['output']>>>;
+  /** Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeaturesGridLayout&quot; Field Group */
+  readonly features: Maybe<ReadonlyArray<Maybe<UniversalSectionsUniversalSectionsFeatures>>>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeaturesGridLayout&quot; Field Group */
+  readonly subtitle: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeaturesGridLayout&quot; Field Group */
+  readonly title: Maybe<Scalars['String']['output']>;
+};
+
+/** Interface representing fields of the ACF &quot;UniversalSectionsUniversalSectionsFeatures&quot; Field Group */
+export type UniversalSectionsUniversalSectionsFeatures_Fields = {
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeatures&quot; Field Group */
+  readonly description: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeatures&quot; Field Group */
+  readonly icon: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeatures&quot; Field Group */
+  readonly linkUrl: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsFeatures&quot; Field Group */
+  readonly title: Maybe<Scalars['String']['output']>;
+};
+
+/** The &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
+export type UniversalSectionsUniversalSectionsHeroLayout = AcfFieldGroup & AcfFieldGroupFields & UniversalSectionsUniversalSectionsHeroLayout_Fields & UniversalSectionsUniversalSections_Layout & {
+  readonly __typename?: 'UniversalSectionsUniversalSectionsHeroLayout';
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly badgeText: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly headline: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly heroImage: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly primaryCtaLabel: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly primaryCtaUrl: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly secondaryCtaLabel: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly secondaryCtaUrl: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;select&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly style: Maybe<ReadonlyArray<Maybe<Scalars['String']['output']>>>;
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly subheadline: Maybe<Scalars['String']['output']>;
+};
+
+/** Interface representing fields of the ACF &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+export type UniversalSectionsUniversalSectionsHeroLayout_Fields = {
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly badgeText: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly headline: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly heroImage: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly primaryCtaLabel: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly primaryCtaUrl: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly secondaryCtaLabel: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly secondaryCtaUrl: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;select&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly style: Maybe<ReadonlyArray<Maybe<Scalars['String']['output']>>>;
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsHeroLayout&quot; Field Group */
+  readonly subheadline: Maybe<Scalars['String']['output']>;
+};
+
+/** The &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
+export type UniversalSectionsUniversalSectionsPlans = AcfFieldGroup & AcfFieldGroupFields & UniversalSectionsUniversalSectionsPlans_Fields & {
+  readonly __typename?: 'UniversalSectionsUniversalSectionsPlans';
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly badge: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly ctaLabel: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly ctaUrl: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly description: Maybe<Scalars['String']['output']>;
+  /** Enter each feature item on a new line. */
+  readonly featuresList: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;true_false&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly isFeatured: Maybe<Scalars['Boolean']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly name: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly period: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly price: Maybe<Scalars['String']['output']>;
+};
+
+/** Interface representing fields of the ACF &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+export type UniversalSectionsUniversalSectionsPlans_Fields = {
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly badge: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly ctaLabel: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly ctaUrl: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly description: Maybe<Scalars['String']['output']>;
+  /** Enter each feature item on a new line. */
+  readonly featuresList: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;true_false&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly isFeatured: Maybe<Scalars['Boolean']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly name: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly period: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPlans&quot; Field Group */
+  readonly price: Maybe<Scalars['String']['output']>;
+};
+
+/** The &quot;UniversalSectionsUniversalSectionsPricingTableLayout&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
+export type UniversalSectionsUniversalSectionsPricingTableLayout = AcfFieldGroup & AcfFieldGroupFields & UniversalSectionsUniversalSectionsPricingTableLayout_Fields & UniversalSectionsUniversalSections_Layout & {
+  readonly __typename?: 'UniversalSectionsUniversalSectionsPricingTableLayout';
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPricingTableLayout&quot; Field Group */
+  readonly plans: Maybe<ReadonlyArray<Maybe<UniversalSectionsUniversalSectionsPlans>>>;
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPricingTableLayout&quot; Field Group */
+  readonly subtitle: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPricingTableLayout&quot; Field Group */
+  readonly title: Maybe<Scalars['String']['output']>;
+};
+
+/** Interface representing fields of the ACF &quot;UniversalSectionsUniversalSectionsPricingTableLayout&quot; Field Group */
+export type UniversalSectionsUniversalSectionsPricingTableLayout_Fields = {
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPricingTableLayout&quot; Field Group */
+  readonly plans: Maybe<ReadonlyArray<Maybe<UniversalSectionsUniversalSectionsPlans>>>;
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPricingTableLayout&quot; Field Group */
+  readonly subtitle: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsPricingTableLayout&quot; Field Group */
+  readonly title: Maybe<Scalars['String']['output']>;
+};
+
+/** The &quot;UniversalSectionsUniversalSectionsTestimonials&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
+export type UniversalSectionsUniversalSectionsTestimonials = AcfFieldGroup & AcfFieldGroupFields & UniversalSectionsUniversalSectionsTestimonials_Fields & {
+  readonly __typename?: 'UniversalSectionsUniversalSectionsTestimonials';
+  /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsTestimonials&quot; Field Group */
+  readonly authorAvatar: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsTestimonials&quot; Field Group */
+  readonly authorName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsTestimonials&quot; Field Group */
+  readonly authorRole: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsTestimonials&quot; Field Group */
+  readonly quote: Maybe<Scalars['String']['output']>;
+};
+
+/** The &quot;UniversalSectionsUniversalSectionsTestimonialsLayout&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
+export type UniversalSectionsUniversalSectionsTestimonialsLayout = AcfFieldGroup & AcfFieldGroupFields & UniversalSectionsUniversalSectionsTestimonialsLayout_Fields & UniversalSectionsUniversalSections_Layout & {
+  readonly __typename?: 'UniversalSectionsUniversalSectionsTestimonialsLayout';
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsTestimonialsLayout&quot; Field Group */
+  readonly testimonials: Maybe<ReadonlyArray<Maybe<UniversalSectionsUniversalSectionsTestimonials>>>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsTestimonialsLayout&quot; Field Group */
+  readonly title: Maybe<Scalars['String']['output']>;
+};
+
+/** Interface representing fields of the ACF &quot;UniversalSectionsUniversalSectionsTestimonialsLayout&quot; Field Group */
+export type UniversalSectionsUniversalSectionsTestimonialsLayout_Fields = {
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsTestimonialsLayout&quot; Field Group */
+  readonly testimonials: Maybe<ReadonlyArray<Maybe<UniversalSectionsUniversalSectionsTestimonials>>>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsTestimonialsLayout&quot; Field Group */
+  readonly title: Maybe<Scalars['String']['output']>;
+};
+
+/** Interface representing fields of the ACF &quot;UniversalSectionsUniversalSectionsTestimonials&quot; Field Group */
+export type UniversalSectionsUniversalSectionsTestimonials_Fields = {
+  /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsTestimonials&quot; Field Group */
+  readonly authorAvatar: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsTestimonials&quot; Field Group */
+  readonly authorName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsTestimonials&quot; Field Group */
+  readonly authorRole: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;UniversalSectionsUniversalSectionsTestimonials&quot; Field Group */
+  readonly quote: Maybe<Scalars['String']['output']>;
+};
+
+/** Layout of the &quot;universalSections&quot; Field of the &quot;UniversalSections&quot; Field Group Field */
+export type UniversalSectionsUniversalSections_Layout = {
+  /** The name of the ACF Flex Field Layout */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+};
+
+/** Interface representing fields of the ACF &quot;UniversalSections&quot; Field Group */
+export type UniversalSections_Fields = {
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  readonly fieldGroupName: Maybe<Scalars['String']['output']>;
+  /** Assemble your page using modular, high-performance sections. */
+  readonly universalSections: Maybe<ReadonlyArray<Maybe<UniversalSectionsUniversalSections_Layout>>>;
 };
 
 /** Input for the updateCategory mutation. */
@@ -9756,10 +10181,10 @@ export type WpPageInfo = {
   readonly startCursor: Maybe<Scalars['String']['output']>;
 };
 
-/** Provides access to fields of the &quot;PageFields&quot; ACF Field Group via the &quot;pageFields&quot; field */
-export type WithAcfPageFields = {
-  /** Fields of the PageFields ACF Field Group */
-  readonly pageFields: Maybe<PageFields>;
+/** Provides access to fields of the &quot;UniversalSections&quot; ACF Field Group via the &quot;universalSections&quot; field */
+export type WithAcfUniversalSections = {
+  /** Fields of the UniversalSections ACF Field Group */
+  readonly universalSections: Maybe<UniversalSections>;
 };
 
 /** The writing setting type */
