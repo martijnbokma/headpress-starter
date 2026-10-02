@@ -2,6 +2,7 @@
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import { NodeByUriDocument } from '~/graphql/generated/graphql';
 import { CONTENT_CACHE_CONTROL, toPlainText, wpQuery } from '~/lib/wordpress';
+import { WP_GRAPHQL_URL } from 'astro:env/server';
 
 const uri = `/${Astro.params.uri ?? ''}/`.replace(/\/+/g, '/');
 
@@ -25,12 +26,76 @@ if (node.uri && node.uri !== Astro.url.pathname) {
 Astro.response.headers.set('Cache-Control', CONTENT_CACHE_CONTROL);
 
 const description = node.__typename === 'Post' ? toPlainText(node.excerpt) : '';
+
+const formattedDate = 'date' in node && node.date
+  ? new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date(node.date))
+  : null;
+
+let editPostUrl = '';
+try {
+  if (WP_GRAPHQL_URL && node.databaseId) {
+    const parsed = new URL(WP_GRAPHQL_URL);
+    const hostname = parsed.hostname === 'host.docker.internal' ? 'localhost' : parsed.hostname;
+    editPostUrl = `${parsed.protocol}//${hostname}${parsed.port ? `:${parsed.port}` : ''}/wp-admin/post.php?post=${node.databaseId}&action=edit`;
+  }
+} catch {
+  // Fallback
+}
 ---
 
 <BaseLayout title={node.title ?? ''} description={description}>
-  <article>
-    <h1 class="text-3xl font-semibold">{node.title}</h1>
-    {description && <p class="text-muted-foreground mt-2 text-lg text-pretty">{description}</p>}
-    <div class="mt-8 space-y-4 leading-relaxed" set:html={node.content ?? ''} />
+  <article class="max-w-3xl mx-auto">
+    <!-- Back Navigation -->
+    <div class="mb-8">
+      <a href="/" class="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground no-underline transition-colors">
+        <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+        <span>Back to all articles</span>
+      </a>
+    </div>
+
+    <!-- Article Header -->
+    <header class="border-b border-border pb-8 mb-8">
+      <div class="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+        <span class="rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 font-semibold text-primary">
+          {node.__typename}
+        </span>
+        {formattedDate && (
+          <time datetime={node.date ?? undefined} class="font-medium">
+            {formattedDate}
+          </time>
+        )}
+      </div>
+
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground text-balance">
+        {node.title}
+      </h1>
+
+      {description && (
+        <p class="mt-4 text-lg text-muted-foreground leading-relaxed text-pretty">
+          {description}
+        </p>
+      )}
+    </header>
+
+    <!-- WordPress Rendered HTML -->
+    <div class="prose max-w-none" set:html={node.content ?? ''} />
+
+    <!-- Article Footer -->
+    <footer class="mt-16 pt-8 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs text-muted-foreground">
+      <div class="flex items-center gap-2">
+        <span class="size-2 rounded-full bg-emerald-500"></span>
+        <span>Decoupled content synced from WordPress</span>
+      </div>
+      {editPostUrl && (
+        <a href={editPostUrl} target="_blank" rel="noopener noreferrer" class="hover:text-foreground inline-flex items-center gap-1 transition-colors no-underline">
+          <span>Edit in WordPress</span>
+          <svg class="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      )}
+    </footer>
   </article>
 </BaseLayout>

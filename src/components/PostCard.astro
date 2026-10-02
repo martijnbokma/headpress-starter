@@ -1,0 +1,65 @@
+---
+import { toPlainText } from '~/lib/wordpress';
+
+interface Props {
+  post: {
+    databaseId?: number | null;
+    title?: string | null;
+    excerpt?: string | null;
+    uri?: string | null;
+    date?: string | null;
+  };
+}
+
+const { post } = Astro.props;
+
+const formattedDate = post.date
+  ? new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date(post.date))
+  : null;
+
+const cleanExcerpt = post.excerpt ? toPlainText(post.excerpt) : '';
+const href = post.uri ?? '#';
+---
+
+<article class="group relative flex flex-col justify-between rounded-xl border border-border bg-surface/40 p-6 transition-all duration-200 hover:border-primary/40 hover:bg-surface hover:shadow-xs">
+  <div>
+    <!-- Card Meta -->
+    <div class="mb-3 flex items-center justify-between text-xs text-muted-foreground">
+      {formattedDate && (
+        <time datetime={post.date ?? undefined} class="font-medium">
+          {formattedDate}
+        </time>
+      )}
+      <span class="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+        Article
+      </span>
+    </div>
+
+    <!-- Title -->
+    <h3 class="text-xl font-bold tracking-tight text-foreground transition-colors group-hover:text-primary">
+      <a href={href} class="no-underline after:absolute after:inset-0 focus:outline-none">
+        {post.title || 'Untitled Post'}
+      </a>
+    </h3>
+
+    <!-- Excerpt -->
+    {cleanExcerpt && (
+      <p class="mt-2.5 line-clamp-3 text-sm leading-relaxed text-muted-foreground text-pretty">
+        {cleanExcerpt}
+      </p>
+    )}
+  </div>
+
+  <!-- Action CTA -->
+  <div class="mt-6 flex items-center gap-1.5 text-xs font-semibold text-primary transition-transform duration-200 group-hover:translate-x-1">
+    <span>Read article</span>
+    <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12h14"/>
+      <path d="m12 5 7 7-7 7"/>
+    </svg>
+  </div>
+</article>

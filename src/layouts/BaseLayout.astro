@@ -1,5 +1,7 @@
 ---
 import { SITE_URL } from 'astro:env/server';
+import Header from '~/components/Header.astro';
+import Footer from '~/components/Footer.astro';
 import '~/styles/theme.css';
 
 interface Props {
@@ -27,11 +29,19 @@ const canonical = new URL(path, SITE_URL).href;
     <meta property="og:title" content={title} />
     {description && <meta property="og:description" content={description} />}
     <meta property="og:url" content={canonical} />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>" />
   </head>
-  <body class="min-h-dvh">
-    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:m-4">Skip to content</a>
-    <main id="main" class="mx-auto max-w-[70ch] px-4 py-12">
+  <body class="min-h-screen flex flex-col bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary transition-colors">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:shadow-md">
+      Skip to main content
+    </a>
+
+    <Header />
+
+    <main id="main" class="flex-1 mx-auto w-full max-w-5xl px-4 sm:px-6 py-10 sm:py-14">
       <slot />
     </main>
+
+    <Footer />
   </body>
 </html>

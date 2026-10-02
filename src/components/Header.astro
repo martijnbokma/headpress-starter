@@ -1,0 +1,60 @@
+---
+import { WP_GRAPHQL_URL } from 'astro:env/server';
+
+let wpAdminUrl = '/wp-admin';
+try {
+  if (WP_GRAPHQL_URL) {
+    const parsed = new URL(WP_GRAPHQL_URL);
+    // Convert Docker internal host to localhost for browser link
+    const hostname = parsed.hostname === 'host.docker.internal' ? 'localhost' : parsed.hostname;
+    wpAdminUrl = `${parsed.protocol}//${hostname}${parsed.port ? `:${parsed.port}` : ''}/wp-admin`;
+  }
+} catch {
+  // Fallback to relative path
+}
+---
+
+<header class="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md transition-colors">
+  <div class="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
+    <!-- Brand / Logo -->
+    <a href="/" class="group flex items-center gap-3 no-underline">
+      <div class="flex size-9 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 text-primary transition-transform group-hover:scale-105">
+        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-base font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
+          HeadPress
+        </span>
+        <span class="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+          Astro Starter
+        </span>
+      </div>
+    </a>
+
+    <!-- Navigation & Status -->
+    <div class="flex items-center gap-3 sm:gap-6">
+      <nav class="hidden sm:flex items-center gap-5 text-sm font-medium">
+        <a href="/#articles" class="text-muted-foreground hover:text-foreground transition-colors no-underline">
+          Articles
+        </a>
+        <a href={wpAdminUrl} target="_blank" rel="noopener noreferrer" class="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors no-underline">
+          <span>WordPress Admin</span>
+          <svg class="size-3.5 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+        <a href="https://github.com/universal-headless/starter" target="_blank" rel="noopener noreferrer" class="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors no-underline">
+          <span>GitHub</span>
+          <svg class="size-3.5 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </nav>
+
+      <!-- Edge Decoupled Live Status Indicator -->
+      <div class="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+        <span class="size-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse"></span>
+        <span>Decoupled Edge</span>
+      </div>
+    </div>
+  </div>
+</header>

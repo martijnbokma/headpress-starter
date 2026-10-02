@@ -1,0 +1,96 @@
+---
+import { WP_GRAPHQL_URL } from 'astro:env/server';
+
+let wpAdminUrl = '/wp-admin';
+let graphqlUrl = '/graphql';
+try {
+  if (WP_GRAPHQL_URL) {
+    const parsed = new URL(WP_GRAPHQL_URL);
+    const hostname = parsed.hostname === 'host.docker.internal' ? 'localhost' : parsed.hostname;
+    wpAdminUrl = `${parsed.protocol}//${hostname}${parsed.port ? `:${parsed.port}` : ''}/wp-admin`;
+    graphqlUrl = `${parsed.protocol}//${hostname}${parsed.port ? `:${parsed.port}` : ''}${parsed.pathname}`;
+  }
+} catch {
+  // Fallback
+}
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="mt-auto border-t border-border bg-surface/40 transition-colors">
+  <div class="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+      <!-- Col 1: Brand & Purpose -->
+      <div class="space-y-3">
+        <div class="flex items-center gap-2">
+          <span class="size-2 rounded-full bg-primary"></span>
+          <span class="text-sm font-bold tracking-tight text-foreground">HeadPress Starter</span>
+        </div>
+        <p class="text-sm text-muted-foreground leading-relaxed text-pretty">
+          High-performance Astro hybrid frontend built for Headless WordPress. Edge-cached, statically generated, and synchronized in real-time with WPGraphQL.
+        </p>
+      </div>
+
+      <!-- Col 2: Endpoints & Health -->
+      <div class="space-y-2.5">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-foreground">Endpoints</h4>
+        <ul class="space-y-2 text-sm text-muted-foreground">
+          <li>
+            <a href="/api/health" class="hover:text-foreground inline-flex items-center gap-1.5 transition-colors no-underline">
+              <span class="size-1.5 rounded-full bg-emerald-500"></span>
+              <span>Health Check API</span>
+            </a>
+          </li>
+          <li>
+            <a href={graphqlUrl} target="_blank" rel="noopener noreferrer" class="hover:text-foreground inline-flex items-center gap-1.5 transition-colors no-underline">
+              <span class="size-1.5 rounded-full bg-primary"></span>
+              <span>WPGraphQL Schema</span>
+            </a>
+          </li>
+          <li>
+            <a href="/api/revalidate" class="hover:text-foreground inline-flex items-center gap-1.5 transition-colors no-underline">
+              <span class="size-1.5 rounded-full bg-amber-500"></span>
+              <span>ISR Webhook Endpoint</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Resources & Links -->
+      <div class="space-y-2.5">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-foreground">Resources</h4>
+        <ul class="space-y-2 text-sm text-muted-foreground">
+          <li>
+            <a href={wpAdminUrl} target="_blank" rel="noopener noreferrer" class="hover:text-foreground transition-colors no-underline">
+              WordPress Dashboard &rarr;
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/universal-headless/starter" target="_blank" rel="noopener noreferrer" class="hover:text-foreground transition-colors no-underline">
+              Starter GitHub Repository &rarr;
+            </a>
+          </li>
+          <li>
+            <a href="https://astro.build" target="_blank" rel="noopener noreferrer" class="hover:text-foreground transition-colors no-underline">
+              Astro Documentation &rarr;
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom strip -->
+    <div class="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 sm:flex-row text-xs text-muted-foreground">
+      <p>&copy; {currentYear} HeadPress. Open-source under MIT License.</p>
+      <div class="flex items-center gap-4">
+        <span>Astro v5 / v7</span>
+        <span>&bull;</span>
+        <span>Tailwind v4</span>
+        <span>&bull;</span>
+        <span>WPGraphQL</span>
+        <span>&bull;</span>
+        <span>TypeScript</span>
+      </div>
+    </div>
+  </div>
+</footer>

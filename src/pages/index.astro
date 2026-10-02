@@ -1,7 +1,10 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
+import PostCard from '~/components/PostCard.astro';
+import DiagnosticsCard from '~/components/DiagnosticsCard.astro';
 import { RecentPostsDocument } from '~/graphql/generated/graphql';
-import { CONTENT_CACHE_CONTROL, toPlainText, wpQuery } from '~/lib/wordpress';
+import { CONTENT_CACHE_CONTROL, wpQuery } from '~/lib/wordpress';
+import { WP_GRAPHQL_URL } from 'astro:env/server';
 
 let posts: readonly any[] = [];
 let connectionError: string | null = null;
@@ -13,56 +16,114 @@ try {
 } catch (error) {
   connectionError = error instanceof Error ? error.message : String(error);
 }
+
+let wpAdminUrl = '/wp-admin';
+try {
+  if (WP_GRAPHQL_URL) {
+    const parsed = new URL(WP_GRAPHQL_URL);
+    const hostname = parsed.hostname === 'host.docker.internal' ? 'localhost' : parsed.hostname;
+    wpAdminUrl = `${parsed.protocol}//${hostname}${parsed.port ? `:${parsed.port}` : ''}/wp-admin`;
+  }
+} catch {
+  // Fallback
+}
 ---
 
-<BaseLayout title="HeadPress Starter" description="Headless WordPress with Astro">
+<BaseLayout title="HeadPress Starter • Headless WordPress with Astro" description="High-performance decoupled frontend for WordPress powered by Astro and WPGraphQL.">
   {
     connectionError ? (
-      <div class="rounded-xl border border-amber-500/30 bg-amber-500/5 p-6 text-foreground">
-        <div class="mb-3 flex items-center gap-3">
-          <span class="inline-flex size-8 items-center justify-center rounded-lg bg-amber-500/10 font-bold text-amber-600">
-            !
-          </span>
-          <h2 class="text-xl font-semibold">HeadPress Starter is Running</h2>
-        </div>
-        <p class="text-muted-foreground mb-4 text-sm">
-          Your Astro frontend is alive, but it cannot reach WordPress yet. Follow these steps to connect:
-        </p>
-        <ol class="text-foreground/80 mb-5 list-inside list-decimal space-y-2 text-sm font-medium">
-          <li>
-            Open your WordPress Admin &rarr; <strong>HeadPress Setup</strong>.
-          </li>
-          <li>
-            Go to the <strong>Astro Connection</strong> tab.
-          </li>
-          <li>
-            Copy the <code>.env</code> configuration and save it as <code>.env</code> in your Astro frontend folder.
-          </li>
-        </ol>
-        <div class="text-muted-foreground rounded bg-black/5 p-3 font-mono text-xs dark:bg-white/5">
-          Diagnostics: {connectionError}
-        </div>
-      </div>
+      <DiagnosticsCard error={connectionError} />
     ) : (
-      <>
-        <h1 class="text-3xl font-semibold">Latest posts</h1>
-        {posts.length === 0 ? (
-          <p class="text-muted-foreground mt-4">
-            You haven't published any posts yet. Write your first one in the WordPress dashboard.
+      <div class="space-y-16">
+        <!-- Hero Section -->
+        <section class="space-y-6 pt-4 pb-2">
+          <div class="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+            <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Decoupled CMS Architecture</span>
+          </div>
+
+          <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl text-foreground text-balance">
+            Publish in WordPress, <span class="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">deliver on the edge</span>.
+          </h1>
+
+          <p class="max-w-2xl text-lg text-muted-foreground leading-relaxed text-pretty">
+            Experience lightning-fast page loads, zero runtime database latency, and rock-solid SEO protection with Astro and WPGraphQL.
           </p>
-        ) : (
-          <ul class="mt-8 space-y-6">
-            {posts.map((post) => (
-              <li>
-                <a href={post.uri ?? '#'} class="text-xl font-medium underline">
-                  {post.title}
+
+          <!-- Feature Cards Grid -->
+          <div class="grid grid-cols-1 gap-4 pt-4 sm:grid-cols-3">
+            <div class="rounded-xl border border-border bg-surface/50 p-5 transition-colors hover:bg-surface">
+              <div class="mb-2 text-xs font-bold uppercase tracking-wider text-primary">Hybrid Rendering</div>
+              <h3 class="text-base font-semibold text-foreground">Instant TTFB</h3>
+              <p class="mt-1 text-xs text-muted-foreground leading-normal">
+                Static by default with on-demand edge rendering and automatic tag caching.
+              </p>
+            </div>
+
+            <div class="rounded-xl border border-border bg-surface/50 p-5 transition-colors hover:bg-surface">
+              <div class="mb-2 text-xs font-bold uppercase tracking-wider text-accent">Type-Safe Schema</div>
+              <h3 class="text-base font-semibold text-foreground">WPGraphQL Ready</h3>
+              <p class="mt-1 text-xs text-muted-foreground leading-normal">
+                Auto-generated TypeScript documents for strict types and autocomplete.
+              </p>
+            </div>
+
+            <div class="rounded-xl border border-border bg-surface/50 p-5 transition-colors hover:bg-surface">
+              <div class="mb-2 text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">HMAC Webhooks</div>
+              <h3 class="text-base font-semibold text-foreground">Instant ISR Purge</h3>
+              <p class="mt-1 text-xs text-muted-foreground leading-normal">
+                WordPress triggers cryptographically signed webhooks to invalidate stale pages.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Articles Section -->
+        <section id="articles" class="space-y-8 scroll-mt-20">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between border-b border-border pb-4">
+            <div>
+              <h2 class="text-2xl font-bold tracking-tight text-foreground">Latest Articles</h2>
+              <p class="text-sm text-muted-foreground mt-0.5">
+                Content fetched in real-time or served from cache from your WordPress backend.
+              </p>
+            </div>
+            <div class="text-xs font-semibold text-muted-foreground">
+              <span class="rounded-full bg-muted px-2.5 py-1">
+                {posts.length} {posts.length === 1 ? 'Article' : 'Articles'}
+              </span>
+            </div>
+          </div>
+
+          {posts.length === 0 ? (
+            <div class="rounded-2xl border border-dashed border-border bg-surface/30 p-12 text-center">
+              <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
+                <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              </div>
+              <h3 class="text-lg font-semibold text-foreground">No articles published yet</h3>
+              <p class="text-muted-foreground text-sm max-w-md mx-auto mt-2 leading-relaxed">
+                Your headless connection is active, but there are no published posts in WordPress. Write your first post in the dashboard to see it rendered here.
+              </p>
+              <div class="mt-6">
+                <a
+                  href={wpAdminUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-semibold text-primary-foreground shadow-xs transition-transform hover:scale-105"
+                >
+                  <span>Open WordPress Dashboard</span>
+                  <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </a>
-                <p class="text-muted-foreground mt-1 text-pretty">{toPlainText(post.excerpt)}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </>
+              </div>
+            </div>
+          ) : (
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {posts.map((post) => (
+                <PostCard post={post} />
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
     )
   }
 </BaseLayout>

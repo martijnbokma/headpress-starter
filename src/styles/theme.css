@@ -1,37 +1,44 @@
 @import 'tailwindcss';
 
 /*
- * Design tokens. Components use the semantic utilities these generate
- * (bg-background, text-muted-foreground, border-border, ...), never raw
- * palette colors. Dark mode follows the system setting and is defined as its
- * own palette, not an inversion.
+ * Design tokens.
+ * Semantic tokens mapped to OKLCH color space for perceptually uniform
+ * contrast across light and dark modes.
  */
 @theme {
-  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --color-background: oklch(0.99 0 0);
-  --color-foreground: oklch(0.2 0.01 260);
-  --color-muted: oklch(0.96 0.005 260);
-  --color-muted-foreground: oklch(0.48 0.015 260);
-  --color-border: oklch(0.91 0.005 260);
-  --color-primary: oklch(0.5 0.17 262);
+  --color-foreground: oklch(0.18 0.01 260);
+  --color-surface: oklch(0.97 0.005 260);
+  --color-surface-hover: oklch(0.94 0.008 260);
+  --color-muted: oklch(0.95 0.005 260);
+  --color-muted-foreground: oklch(0.46 0.015 260);
+  --color-border: oklch(0.90 0.005 260);
+  --color-primary: oklch(0.52 0.18 262);
   --color-primary-foreground: oklch(0.99 0 0);
-  --color-destructive: oklch(0.55 0.2 27);
+  --color-accent: oklch(0.60 0.22 340);
+  --color-destructive: oklch(0.55 0.20 27);
 
-  --radius-sm: 4px;
-  --radius-md: 8px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
   --radius-lg: 16px;
+  --radius-xl: 24px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-background: oklch(0.17 0.008 260);
-    --color-foreground: oklch(0.95 0.005 260);
-    --color-muted: oklch(0.22 0.01 260);
-    --color-muted-foreground: oklch(0.72 0.012 260);
-    --color-border: oklch(0.3 0.01 260);
+    --color-background: oklch(0.13 0.01 260);
+    --color-foreground: oklch(0.96 0.005 260);
+    --color-surface: oklch(0.18 0.01 260);
+    --color-surface-hover: oklch(0.22 0.012 260);
+    --color-muted: oklch(0.20 0.01 260);
+    --color-muted-foreground: oklch(0.68 0.012 260);
+    --color-border: oklch(0.25 0.01 260);
     --color-primary: oklch(0.72 0.14 262);
-    --color-primary-foreground: oklch(0.17 0.008 260);
+    --color-primary-foreground: oklch(0.13 0.01 260);
+    --color-accent: oklch(0.75 0.18 340);
     --color-destructive: oklch(0.68 0.18 27);
   }
 }
@@ -44,12 +51,15 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
   }
 
   h1,
   h2,
-  h3 {
+  h3,
+  h4 {
     text-wrap: balance;
   }
 
@@ -62,4 +72,134 @@
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
   }
+}
+
+/*
+ * WordPress Content & Prose Typography
+ * Clean, readable editorial styles for content returned from WordPress.
+ */
+.prose {
+  color: var(--color-foreground);
+  line-height: 1.8;
+  font-size: 1.0625rem;
+}
+
+.prose p {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  color: var(--color-foreground);
+  font-weight: 700;
+  line-height: 1.3;
+  margin-top: 2em;
+  margin-bottom: 0.75em;
+  letter-spacing: -0.02em;
+}
+
+.prose h2 {
+  font-size: 1.625rem;
+}
+
+.prose h3 {
+  font-size: 1.3125rem;
+}
+
+.prose a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 500;
+  transition: opacity 0.15s ease;
+}
+
+.prose a:hover {
+  opacity: 0.8;
+}
+
+.prose strong,
+.prose b {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+
+.prose blockquote {
+  border-left: 3px solid var(--color-primary);
+  padding-left: 1.25rem;
+  margin-top: 1.75em;
+  margin-bottom: 1.75em;
+  font-style: italic;
+  color: var(--color-muted-foreground);
+}
+
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
+.prose li {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose img {
+  border-radius: var(--radius-md);
+  max-width: 100%;
+  height: auto;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  border: 1px solid var(--color-border);
+}
+
+.prose figure {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.prose figcaption {
+  font-size: 0.875rem;
+  color: var(--color-muted-foreground);
+  text-align: center;
+  margin-top: 0.6em;
+}
+
+.prose pre {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  margin-top: 1.75em;
+  margin-bottom: 1.75em;
+}
+
+.prose code:not(pre code) {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 0.15em 0.4em;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  margin-top: 2.5em;
+  margin-bottom: 2.5em;
 }

@@ -1,0 +1,49 @@
+---
+interface Props {
+  error: string;
+}
+
+const { error } = Astro.props;
+---
+
+<div class="rounded-xl border border-amber-500/30 bg-amber-500/5 p-6 sm:p-8 text-foreground transition-colors">
+  <div class="mb-4 flex items-center gap-3">
+    <div class="flex size-10 items-center justify-center rounded-lg bg-amber-500/10 font-bold text-amber-600 dark:text-amber-400">
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    </div>
+    <div>
+      <h2 class="text-xl font-bold tracking-tight">HeadPress Frontend is Running</h2>
+      <p class="text-xs text-muted-foreground">Awaiting WordPress GraphQL connection</p>
+    </div>
+  </div>
+
+  <p class="text-sm text-muted-foreground mb-5 leading-relaxed">
+    Your Astro server is online and ready, but it could not reach your WordPress GraphQL endpoint. Follow these quick steps to complete the link:
+  </p>
+
+  <ol class="mb-6 space-y-2.5 text-sm font-medium text-foreground/90 list-decimal list-inside">
+    <li class="pl-1">
+      Open your WordPress Admin and navigate to <strong class="text-foreground">HeadPress Setup</strong>.
+    </li>
+    <li class="pl-1">
+      Switch to the <strong class="text-foreground">Astro Connection</strong> tab.
+    </li>
+    <li class="pl-1">
+      Verify that your <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">.env</code> contains <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">WP_GRAPHQL_URL</code> and <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">HEADLESS_REVALIDATE_SECRET</code>.
+    </li>
+    <li class="pl-1">
+      Click <strong class="text-foreground">Test Connection</strong> in the WordPress wizard to verify round-trip synchronization.
+    </li>
+  </ol>
+
+  <div class="rounded-lg border border-border bg-surface p-4">
+    <div class="mb-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Technical Diagnostics</div>
+    <div class="font-mono text-xs text-foreground/80 break-all leading-normal">
+      {error}
+    </div>
+  </div>
+</div>
