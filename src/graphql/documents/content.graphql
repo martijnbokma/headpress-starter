@@ -6,9 +6,7 @@ query NodeByUri($uri: String!) {
       title
       content
       uri
-      pageFields {
-        intro
-      }
+      date
     }
     ... on Post {
       databaseId

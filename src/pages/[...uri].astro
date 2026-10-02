@@ -24,7 +24,7 @@ if (node.uri && node.uri !== Astro.url.pathname) {
 
 Astro.response.headers.set('Cache-Control', CONTENT_CACHE_CONTROL);
 
-const description = node.__typename === 'Page' ? (node.pageFields?.intro ?? '') : toPlainText(node.excerpt);
+const description = node.__typename === 'Post' ? toPlainText(node.excerpt) : '';
 ---
 
 <BaseLayout title={node.title ?? ''} description={description}>
