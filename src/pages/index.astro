@@ -3,30 +3,66 @@ import BaseLayout from '~/layouts/BaseLayout.astro';
 import { RecentPostsDocument } from '~/graphql/generated/graphql';
 import { CONTENT_CACHE_CONTROL, toPlainText, wpQuery } from '~/lib/wordpress';
 
-const data = await wpQuery(RecentPostsDocument, { first: 10 }, () => ['type:post']);
-const posts = data.posts?.nodes ?? [];
+let posts: any[] = [];
+let connectionError: string | null = null;
 
-Astro.response.headers.set('Cache-Control', CONTENT_CACHE_CONTROL);
+try {
+  const data = await wpQuery(RecentPostsDocument, { first: 10 }, () => ['type:post']);
+  posts = data.posts?.nodes ?? [];
+  Astro.response.headers.set('Cache-Control', CONTENT_CACHE_CONTROL);
+} catch (error) {
+  connectionError = error instanceof Error ? error.message : String(error);
+}
 ---
 
-<BaseLayout title="Universal Headless Starter" description="Latest posts">
-  <h1 class="text-3xl font-semibold">Latest posts</h1>
+<BaseLayout title="HeadPress Starter" description="Headless WordPress with Astro">
   {
-    posts.length === 0 ? (
-      <p class="text-muted-foreground mt-4">
-        You haven't published any posts yet. Write your first one in the WordPress dashboard.
-      </p>
-    ) : (
-      <ul class="mt-8 space-y-6">
-        {posts.map((post) => (
+    connectionError ? (
+      <div class="rounded-xl border border-amber-500/30 bg-amber-500/5 p-6 text-foreground">
+        <div class="mb-3 flex items-center gap-3">
+          <span class="inline-flex size-8 items-center justify-center rounded-lg bg-amber-500/10 font-bold text-amber-600">
+            !
+          </span>
+          <h2 class="text-xl font-semibold">HeadPress Starter is Running</h2>
+        </div>
+        <p class="text-muted-foreground mb-4 text-sm">
+          Your Astro frontend is alive, but it cannot reach WordPress yet. Follow these steps to connect:
+        </p>
+        <ol class="text-foreground/80 mb-5 list-inside list-decimal space-y-2 text-sm font-medium">
           <li>
-            <a href={post.uri ?? '#'} class="text-xl font-medium underline">
-              {post.title}
-            </a>
-            <p class="text-muted-foreground mt-1 text-pretty">{toPlainText(post.excerpt)}</p>
+            Open your WordPress Admin &rarr; <strong>HeadPress Setup</strong>.
           </li>
-        ))}
-      </ul>
+          <li>
+            Go to the <strong>Astro Connection</strong> tab.
+          </li>
+          <li>
+            Copy the <code>.env</code> configuration and save it as <code>.env</code> in your Astro frontend folder.
+          </li>
+        </ol>
+        <div class="text-muted-foreground rounded bg-black/5 p-3 font-mono text-xs dark:bg-white/5">
+          Diagnostics: {connectionError}
+        </div>
+      </div>
+    ) : (
+      <>
+        <h1 class="text-3xl font-semibold">Latest posts</h1>
+        {posts.length === 0 ? (
+          <p class="text-muted-foreground mt-4">
+            You haven't published any posts yet. Write your first one in the WordPress dashboard.
+          </p>
+        ) : (
+          <ul class="mt-8 space-y-6">
+            {posts.map((post) => (
+              <li>
+                <a href={post.uri ?? '#'} class="text-xl font-medium underline">
+                  {post.title}
+                </a>
+                <p class="text-muted-foreground mt-1 text-pretty">{toPlainText(post.excerpt)}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </>
     )
   }
 </BaseLayout>

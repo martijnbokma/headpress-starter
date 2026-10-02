@@ -16,8 +16,14 @@ export default defineConfig({
   markdown: { syntaxHighlight: false },
   env: {
     schema: {
-      // Required: `bun run setup` writes it to .env for local development.
-      WP_GRAPHQL_URL: envField.string({ context: 'server', access: 'secret', url: true }),
+      // Set in .env; provides default fallback so fresh clones start without crashing before .env is set.
+      WP_GRAPHQL_URL: envField.string({
+        context: 'server',
+        access: 'secret',
+        url: true,
+        optional: true,
+        default: 'http://localhost:8080/graphql',
+      }),
       HEADLESS_REVALIDATE_SECRET: envField.string({
         context: 'server',
         access: 'secret',
