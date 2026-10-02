@@ -1,0 +1,34 @@
+query NodeByUri($uri: String!) {
+  nodeByUri(uri: $uri) {
+    __typename
+    ... on Page {
+      databaseId
+      title
+      content
+      uri
+      pageFields {
+        intro
+      }
+    }
+    ... on Post {
+      databaseId
+      title
+      content
+      excerpt
+      uri
+      date
+    }
+  }
+}
+
+query RecentPosts($first: Int = 10) {
+  posts(first: $first) {
+    nodes {
+      databaseId
+      title
+      excerpt
+      uri
+      date
+    }
+  }
+}

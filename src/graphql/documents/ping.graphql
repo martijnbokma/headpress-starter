@@ -1,0 +1,6 @@
+# Used by /api/revalidate's connection test to prove the website can read WordPress.
+query Ping {
+  generalSettings {
+    title
+  }
+}

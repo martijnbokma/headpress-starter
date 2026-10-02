@@ -1,0 +1,36 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { NodeByUriDocument } from '~/graphql/generated/graphql';
+import { CONTENT_CACHE_CONTROL, toPlainText, wpQuery } from '~/lib/wordpress';
+
+const uri = `/${Astro.params.uri ?? ''}/`.replace(/\/+/g, '/');
+
+const { nodeByUri: node } = await wpQuery(NodeByUriDocument, { uri }, ({ nodeByUri }) =>
+  // Only cache found content; a 404 must not hide a page published later.
+  nodeByUri && 'databaseId' in nodeByUri
+    ? [`post:${nodeByUri.databaseId}`, `type:${nodeByUri.__typename.toLowerCase()}`]
+    : [],
+);
+
+if (!node || (node.__typename !== 'Page' && node.__typename !== 'Post')) {
+  // An empty 404 response makes Astro render src/pages/404.astro.
+  return new Response(null, { status: 404 });
+}
+
+// WordPress is the source of truth for the canonical path (trailing slash).
+if (node.uri && node.uri !== Astro.url.pathname) {
+  return Astro.redirect(node.uri + Astro.url.search, 301);
+}
+
+Astro.response.headers.set('Cache-Control', CONTENT_CACHE_CONTROL);
+
+const description = node.__typename === 'Page' ? (node.pageFields?.intro ?? '') : toPlainText(node.excerpt);
+---
+
+<BaseLayout title={node.title ?? ''} description={description}>
+  <article>
+    <h1 class="text-3xl font-semibold">{node.title}</h1>
+    {description && <p class="text-muted-foreground mt-2 text-lg text-pretty">{description}</p>}
+    <div class="mt-8 space-y-4 leading-relaxed" set:html={node.content ?? ''} />
+  </article>
+</BaseLayout>

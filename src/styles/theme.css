@@ -1,0 +1,65 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. Components use the semantic utilities these generate
+ * (bg-background, text-muted-foreground, border-border, ...), never raw
+ * palette colors. Dark mode follows the system setting and is defined as its
+ * own palette, not an inversion.
+ */
+@theme {
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: oklch(0.99 0 0);
+  --color-foreground: oklch(0.2 0.01 260);
+  --color-muted: oklch(0.96 0.005 260);
+  --color-muted-foreground: oklch(0.48 0.015 260);
+  --color-border: oklch(0.91 0.005 260);
+  --color-primary: oklch(0.5 0.17 262);
+  --color-primary-foreground: oklch(0.99 0 0);
+  --color-destructive: oklch(0.55 0.2 27);
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: oklch(0.17 0.008 260);
+    --color-foreground: oklch(0.95 0.005 260);
+    --color-muted: oklch(0.22 0.01 260);
+    --color-muted-foreground: oklch(0.72 0.012 260);
+    --color-border: oklch(0.3 0.01 260);
+    --color-primary: oklch(0.72 0.14 262);
+    --color-primary-foreground: oklch(0.17 0.008 260);
+    --color-destructive: oklch(0.68 0.18 27);
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: light dark;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  a {
+    text-underline-position: from-font;
+    text-decoration-skip-ink: auto;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}

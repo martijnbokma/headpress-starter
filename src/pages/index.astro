@@ -1,0 +1,32 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { RecentPostsDocument } from '~/graphql/generated/graphql';
+import { CONTENT_CACHE_CONTROL, toPlainText, wpQuery } from '~/lib/wordpress';
+
+const data = await wpQuery(RecentPostsDocument, { first: 10 }, () => ['type:post']);
+const posts = data.posts?.nodes ?? [];
+
+Astro.response.headers.set('Cache-Control', CONTENT_CACHE_CONTROL);
+---
+
+<BaseLayout title="Universal Headless Starter" description="Latest posts">
+  <h1 class="text-3xl font-semibold">Latest posts</h1>
+  {
+    posts.length === 0 ? (
+      <p class="text-muted-foreground mt-4">
+        You haven't published any posts yet. Write your first one in the WordPress dashboard.
+      </p>
+    ) : (
+      <ul class="mt-8 space-y-6">
+        {posts.map((post) => (
+          <li>
+            <a href={post.uri ?? '#'} class="text-xl font-medium underline">
+              {post.title}
+            </a>
+            <p class="text-muted-foreground mt-1 text-pretty">{toPlainText(post.excerpt)}</p>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</BaseLayout>
