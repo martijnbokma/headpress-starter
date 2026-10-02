@@ -3,7 +3,7 @@ import BaseLayout from '~/layouts/BaseLayout.astro';
 import { RecentPostsDocument } from '~/graphql/generated/graphql';
 import { CONTENT_CACHE_CONTROL, toPlainText, wpQuery } from '~/lib/wordpress';
 
-let posts: any[] = [];
+let posts: readonly any[] = [];
 let connectionError: string | null = null;
 
 try {
