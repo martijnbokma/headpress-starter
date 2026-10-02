@@ -15,3 +15,5 @@ dist/
 # OS / Editor clutter
 .DS_Store
 *.log
+.wrangler/
+

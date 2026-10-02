@@ -1,15 +1,22 @@
 // @ts-check
 import { defineConfig, envField } from 'astro/config';
 import node from '@astrojs/node';
+import cloudflare from '@astrojs/cloudflare';
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
+
+const isCloudflare = process.env.CF_PAGES === '1' || process.env.DEPLOY_TARGET === 'cloudflare';
 
 export default defineConfig({
   // Content routes render on demand and read through a tagged cache that
   // WordPress purges via /api/revalidate (see docs/SPEC.md, decision 1).
   // Pages with no CMS data can opt into `export const prerender = true`.
   output: 'server',
-  adapter: node({ mode: 'standalone' }),
+  adapter: isCloudflare
+    ? cloudflare({
+        imageService: 'cloudflare',
+      })
+    : node({ mode: 'standalone' }),
   integrations: [react()],
   server: { port: 4321, host: true },
   // No Markdown code blocks here; Shiki's inline styles would clash with the CSP.
