@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "postbuild": "node scripts/prepare-cloudflare-pages.mjs",
     "build:cloudflare": "DEPLOY_TARGET=cloudflare astro build",
     "deploy:cloudflare": "wrangler deploy --config dist/server/wrangler.json",
     "preview": "astro preview",
