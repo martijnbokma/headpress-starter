@@ -5,7 +5,13 @@ import cloudflare from '@astrojs/cloudflare';
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 
-const isCloudflare = process.env.CF_PAGES === '1' || process.env.DEPLOY_TARGET === 'cloudflare';
+const isCloudflare =
+  process.env.CF_PAGES === '1' ||
+  process.env.DEPLOY_TARGET === 'cloudflare' ||
+  Boolean(process.env.CF_WORKER) ||
+  Boolean(process.env.CF_PAGES) ||
+  Boolean(process.env.CLOUDFLARE) ||
+  Boolean(process.env.WRANGLER_SEND_METRICS);
 
 export default defineConfig({
   // Content routes render on demand and read through a tagged cache that
